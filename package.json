@@ -1,0 +1,33 @@
+{
+  "name": "httpcookiessession_auth",
+  "version": "1.0.0",
+  "description": "This is a practice for handle sessions, cookies and http auth",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon www"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Craken420/HttpCookiesSession_Auth.git"
+  },
+  "keywords": [
+    "session",
+    "cookies",
+    "http",
+    "auth"
+  ],
+  "author": "Luis Angel Peña Zuñiga",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Craken420/HttpCookiesSession_Auth/issues"
+  },
+  "homepage": "https://github.com/Craken420/HttpCookiesSession_Auth#readme",
+  "devDependencies": {
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.7"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "http": "0.0.1-security"
+  }
+}
