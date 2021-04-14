@@ -14,27 +14,35 @@ app.use(express.urlencoded({ extended: false }));
 app.get('/', function(req, res) {
   res.setHeader('Content-Type', 'text/html');
   res.write(`<h1>Welcome to the HTTP authentication</h1>
-    <form method="GET" action="/login">
-      <input placeholder="enter your username" name="username">
-      <input placeholder="enter your password" name="password">
-      <input type="submit" value="Set session">
-    </form>`)
+    <a href="/secret">Secret</a>`)
 });
 
-// Login route
-app.get('/login', function(req, res) {
-  let username = req.query.username;
-  let password = req.query.password;
-  if (!username || !password)
-    res.send('No data');
+function sendAuth (req, res, next) {
+  var err = new Error("You are not authenticated");
+  res.setHeader("WWW-Authenticate", "Basic");
+  err.status = 401;
+  next(err);
+}
+
+// Auth middleware
+function auth (req, res, next) {
+  var authHeader = req.headers.authorization;
+  if (!authHeader)
+    sendAuth(req, res, next);
+
+  var auth = new Buffer.from(authHeader.split(" ")[1], "base64")
+    .toString()
+    .split(":");
+  var username = auth[0];
+  var password = auth[1];
   if (username == "angelo" && password == "1234")
-    res.redirect('/secret');
+    next();
   else
-    res.send('Login Fail');
-});
+    sendAuth(req, res, next)
+}
 
 // Secret content
-app.get('/secret', (req, res) => {
+app.get('/secret', auth, (req, res) => {
   res.setHeader('Content-Type', 'text/html');
   res.write(`<h1>Welcome You're Ahutorized</h1><br>
   <p> You can only see this after you've logged in</p>
