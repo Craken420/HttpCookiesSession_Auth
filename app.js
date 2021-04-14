@@ -3,20 +3,12 @@ var logger = require('morgan');
 
 var app = express();
 
-// middelwares
+// Middelwares
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// routes
-
-// Main route
-app.get('/', function(req, res) {
-  res.setHeader('Content-Type', 'text/html');
-  res.write(`<h1>Welcome to the HTTP authentication</h1>
-    <a href="/secret">Secret</a>`)
-});
-
+// WWW-Authenticate
 function sendAuth (req, res, next) {
   var err = new Error("You are not authenticated");
   res.setHeader("WWW-Authenticate", "Basic");
@@ -38,15 +30,26 @@ function auth (req, res, next) {
   if (username == "angelo" && password == "1234")
     next();
   else
-    sendAuth(req, res, next)
+    sendAuth(req, res, next);
 }
 
-// Secret content
-app.get('/secret', auth, (req, res) => {
+// Controllers
+function showSecretContent (req, res) {
   res.setHeader('Content-Type', 'text/html');
   res.write(`<h1>Welcome You're Ahutorized</h1><br>
   <p> You can only see this after you've logged in</p>
   <a href="/">Home</a>`)
+}
+
+// Routes
+// Main route
+app.get('/', function(req, res) {
+  res.setHeader('Content-Type', 'text/html');
+  res.write(`<h1>Welcome to the HTTP authentication</h1>
+    <a href="/httpSecret">Http Secret</a>`)
 });
+
+// Secret content
+app.get('/httpSecret', auth, showSecretContent);
 
 module.exports = app;
