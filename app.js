@@ -120,12 +120,18 @@ cookiesRouter.get('/', authCookie, (req, res) => {
       <input placeholder="enter your cookie val" name="val">
       <input type="submit" value="Generete Sign Cookie With Param">
     </form>
+    <form method="GET" action="/cookies/clearCookieByName">
+      <input placeholder="enter your cookie name" name="name">
+      <input type="submit" value="Clear Cookie">
+    </form>
     <a href="/cookies/setCookie">Generete cookie</a><br/>
     <a href="/cookies/setSignCookie">Generete Sign Cookie</a><br/>
+    <a href="/cookies/clearAllCookies">Clear All Cookies</a><br/>
     <a href="/">Home</a><br/>`);
   const cookies = cookie.parse(req.headers.cookie || '');
   if (cookies.user)
-    res.write(`<a href="/cookies/logout">Logout</a>`).end();
+    res.write(`<a href="/cookies/logout">Logout</a>`);
+    res.end();
 });
 cookiesRouter.get('/logout', authCookie, (req, res) => {
   res.clearCookie('user').redirect('/');
@@ -146,6 +152,20 @@ cookiesRouter.get('/signCookieWithParam', (req, res) => {
   res.cookie(String(name), String(val), { signed: true } ) // Crear y firmar cookie
     .redirect('/cookies');
 });
+cookiesRouter.get('/clearCookieByName', (req, res) => {
+  let query = url.parse(req.url, true, true).query;
+  res.clearCookie( String(query.name) ) // Eliminar
+      .redirect('/cookies');
+});
+cookiesRouter.get('/clearAllCookies',(req, res) => {
+  Object.getOwnPropertyNames(req.cookies)
+    .concat(Object.getOwnPropertyNames(req.signedCookies))
+    .forEach(cookieName => {
+        res.clearCookie(cookieName); // Eliminar
+    });
+  res.redirect('/cookies');
+});
+
 const sessionRouter = express.Router();
 
 sessionRouter.use(session({
