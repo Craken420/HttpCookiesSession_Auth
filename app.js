@@ -1,6 +1,9 @@
-var express = require('express');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser')
+// Dependencies
+var express = require('express'),
+    logger = require('morgan'),
+    cookieParser = require('cookie-parser'),
+    session = require('express-session'),
+    fileStore = require('session-file-store')(session);
 
 var app = express();
 
@@ -55,6 +58,25 @@ function authCookie (req, res, next) {
   }
 }
 
+function authSession (req, res, next) {
+  if  (!req.session.user) { // Check user session
+    authResu = getAuth(req, res, next);
+    if (authResu.username == "session" && authResu.password == "1234") {
+      req.session.user = authResu.username    // Send user session
+      req.session.password = authResu.password // Send user session
+      next();
+    }
+    else
+      sendAuth(req, res, next);
+  }
+  else {
+    if (req.session.user == 'session') // Using the user cookies
+      next();
+    else
+      sendAuth(req, res, next);
+  }
+}
+
 // Controllers
 function showSecretContent (req, res) {
   res.setHeader('Content-Type', 'text/html');
@@ -69,11 +91,27 @@ app.get('/', function(req, res) {
   res.setHeader('Content-Type', 'text/html');
   res.write(`<h1>Welcome to the HTTP authentication</h1>
     <a href="/httpSecret">Http Secret</a><br/>
-    <a href="/cookieSecret">Cookie Secret</a>`)
+    <a href="/cookieSecret">Cookie Secret</a><br/>
+    <a href="/sessionSecret">Session Secret</a>`)
 });
 
 // Secret content
 app.get('/httpSecret', auth, showSecretContent);
 app.get('/cookieSecret', authCookie, showSecretContent);
+
+const sessionRouter = express.Router();
+
+sessionRouter.use(session({
+  name:'session-id',
+  secret:'123456xxx',
+  saveUninitialized: false,
+  resave: false,
+  retries: 0, // No intente buscar sesiones caducadas
+  store: new fileStore({logFn: function(){}}) // No mostrar el logger de archivos no encontrados
+}))
+
+sessionRouter.get('/sessionSecret', authSession, showSecretContent)
+
+app.use('/', sessionRouter)
 
 module.exports = app;
