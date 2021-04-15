@@ -82,6 +82,8 @@ function showSecretContent (req, res) {
   res.setHeader('Content-Type', 'text/html');
   res.write(`<h1>Welcome You're Ahutorized</h1><br>
   <p> You can only see this after you've logged in</p>
+  <a href="/cookie">Cookie</a><br/>
+  <a href="/session">Session</a>
   <a href="/">Home</a>`)
 }
 
@@ -91,13 +93,25 @@ app.get('/', function(req, res) {
   res.setHeader('Content-Type', 'text/html');
   res.write(`<h1>Welcome to the HTTP authentication</h1>
     <a href="/httpSecret">Http Secret</a><br/>
-    <a href="/cookieSecret">Cookie Secret</a><br/>
+    <a href="/cookies">Cookie Secret</a><br/>
     <a href="/sessionSecret">Session Secret</a>`)
 });
 
 // Secret content
 app.get('/httpSecret', auth, showSecretContent);
-app.get('/cookieSecret', authCookie, showSecretContent);
+
+const cookiesRouter = express.Router();
+
+cookiesRouter.get('/', authCookie, (req, res) => {
+  res.setHeader('Content-Type', 'text/html');
+  res.write(`<h1>Welcome to cookies controller</h1>
+    <p>req.headers.cookie: ${req.headers.cookie}</p>
+    <p>req.cookies: ${JSON.stringify(req.cookies)}</p>
+    <p>req.signedCookies: ${JSON.stringify(req.signedCookies)}</p>
+    <p>req.headers.authorization:  ${JSON.stringify(req.headers.authorization)}</p>
+    <a href="/">Home</a><br/>`);
+  res.end();
+});
 
 const sessionRouter = express.Router();
 
@@ -113,5 +127,6 @@ sessionRouter.use(session({
 sessionRouter.get('/sessionSecret', authSession, showSecretContent)
 
 app.use('/', sessionRouter)
+app.use('/cookies', cookiesRouter)
 
 module.exports = app;
