@@ -3,6 +3,7 @@ var express = require('express'),
     logger = require('morgan'),
     cookieParser = require('cookie-parser'),
     cookie = require('cookie'), // Analizador de cookies
+    url = require('url'),
     session = require('express-session'),
     fileStore = require('session-file-store')(session);
 
@@ -114,17 +115,37 @@ cookiesRouter.get('/', authCookie, (req, res) => {
     <p>req.cookies: ${JSON.stringify(req.cookies)}</p>
     <p>req.signedCookies: ${JSON.stringify(req.signedCookies)}</p>
     <p>req.headers.authorization:  ${JSON.stringify(req.headers.authorization)}</p>
+    <form method="GET" action="/cookies/signCookieWithParam">
+      <input placeholder="enter your cookie name" name="name">
+      <input placeholder="enter your cookie val" name="val">
+      <input type="submit" value="Generete Sign Cookie With Param">
+    </form>
+    <a href="/cookies/setCookie">Generete cookie</a><br/>
+    <a href="/cookies/setSignCookie">Generete Sign Cookie</a><br/>
     <a href="/">Home</a><br/>`);
   const cookies = cookie.parse(req.headers.cookie || '');
   if (cookies.user)
-    res.write(`<a href="/cookies/logout">Logout</a>`);
-  res.end();
+    res.write(`<a href="/cookies/logout">Logout</a>`).end();
 });
 cookiesRouter.get('/logout', authCookie, (req, res) => {
-  res.clearCookie('user');
-  res.redirect('/');
+  res.clearCookie('user').redirect('/');
 });
+cookiesRouter.get('/setCookie', (req, res) => { // definir una nueva cookie
+  res.cookie('cookie_name', 'cookie_value',{expire : new Date() + 9999})
+    .redirect('/cookies');});
 
+cookiesRouter.get('/setSignCookie', (req, res) => {
+  let cookieVal = 'sing-cookie_value';
+  res.cookie('sign-cookie_name', cookieVal, // definir una nueva cookie
+      { signed: true, expire : new Date() + 9999 }) // firmar y agregar expiracion
+      .redirect('/cookies');
+});
+cookiesRouter.get('/signCookieWithParam', (req, res) => {
+  let {name, val} =
+      url.parse(req.url, true, true).query; // Extraer parametros
+  res.cookie(String(name), String(val), { signed: true } ) // Crear y firmar cookie
+    .redirect('/cookies');
+});
 const sessionRouter = express.Router();
 
 sessionRouter.use(session({
