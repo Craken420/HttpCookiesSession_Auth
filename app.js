@@ -2,6 +2,7 @@
 var express = require('express'),
     logger = require('morgan'),
     cookieParser = require('cookie-parser'),
+    cookie = require('cookie'), // Analizador de cookies
     session = require('express-session'),
     fileStore = require('session-file-store')(session);
 
@@ -94,7 +95,11 @@ app.get('/', function(req, res) {
   res.write(`<h1>Welcome to the HTTP authentication</h1>
     <a href="/httpSecret">Http Secret</a><br/>
     <a href="/cookies">Cookie Secret</a><br/>
-    <a href="/sessionSecret">Session Secret</a>`)
+    <a href="/sessionSecret">Session Secret</a><br/>`)
+  const cookies = cookie.parse(req.headers.cookie || '');
+  if (cookies.user)
+      res.write(`<a href="/cookies/logout">Logout</a>`);
+  res.end();
 });
 
 // Secret content
@@ -110,7 +115,14 @@ cookiesRouter.get('/', authCookie, (req, res) => {
     <p>req.signedCookies: ${JSON.stringify(req.signedCookies)}</p>
     <p>req.headers.authorization:  ${JSON.stringify(req.headers.authorization)}</p>
     <a href="/">Home</a><br/>`);
+  const cookies = cookie.parse(req.headers.cookie || '');
+  if (cookies.user)
+    res.write(`<a href="/cookies/logout">Logout</a>`);
   res.end();
+});
+cookiesRouter.get('/logout', authCookie, (req, res) => {
+  res.clearCookie('user');
+  res.redirect('/');
 });
 
 const sessionRouter = express.Router();
