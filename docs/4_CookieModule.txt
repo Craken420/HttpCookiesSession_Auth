@@ -1,0 +1,16 @@
+Cookie: analizar y serializar cookies para servidores HTTP
+
+    cookie.parse(str, options)
+        options: decode
+            cookie tiene un tamaño límite por lo cual codificar antes de enviar es buena practica
+    
+    cookie.serialize(name,value,options):
+        Añade una cookie de nombre name y valor value, siguiendo la opciones
+        options:
+        Domain: dominios cookie, desactivado por defecto.
+        Encode: similar a parse pero este codifica.
+        Expires: tiempo válido, defecto (no tendrá fecha), se eliminará al cerrar la página web o el explorador.
+        httpOnly: uso sólo por métodos http.
+        maxAge: similar a expires, indicando, en segundos, el tiempo máximo que podrá vivir una cookie.
+        sameSite: especifica si una cookie sólo puede ser utilizada en una sóla página. (ignored usually)
+        Secure: flag-indicador que las cookies se usen solo en conexiones HTTPS.

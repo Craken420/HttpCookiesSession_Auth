@@ -1,0 +1,41 @@
+
+Concepto: documento enviado del servidor al cliente, el cual es devuelto del cliente al servidor
+    Examples: Set-Cookie: yummy_cookie=choco
+              Set-Cookie: tasty_cookie=strawberry
+              Cookie: yummy_cookie=choco; tasty_cookie=strawberry
+
+Temporales con expiración: Set-Cookie: id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT;
+
+Cookies seguras y HTTPOnly:
+    Enviar cookies solo si usa SSL y protocolo HTTPS
+    Evita almacenar o transmitir Cookies HTTP de Información confidencial o sensible
+    Prevenir ataques XSS, las cookies HTTP-only no son accesibles vía Js
+    "Document.cookie", la "XMLHttpRequest" y las "Request APIs".
+    Si usas cookies solo de sesión, no las necesitas en Js
+    y el flag HttpOnly debería estar activo.
+        Example: Set-Cookie: id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly
+
+Alcance de las cookies:
+    Domain: Especifica los hosts a los cuáles será envíada la cookie.
+        default: porción host de la localización del documento actual (sin incluir los subdominios)
+        Si Domain=mozilla.org, entonces las cookies se incluyen en subdominios como
+        developer.mozilla.org
+    
+    Path: Por que rutas se enviara
+        Path=/docs, entonces se incluirán las rutas:
+            "/docs"
+            "/docs/Web/"
+            "/docs/Web/HTTP"
+
+Cookies SameSite
+    No envia cookies en peticiones "cross-site" como protección contra ataques (CSRF)
+
+Acceso Js utilizando Document.cookies:
+    Crear usando la propiedad "Document.cookie", y flag "HttpOnly" no activo,
+    las cookies existentes pueden ser accedidas por Js también.
+
+    document.cookie = "yummy_cookie=choco"; 
+    document.cookie = "tasty_cookie=strawberry"; 
+    console.log(document.cookie); 
+        //-> logs "yummy_cookie=choco; tasty_cookie=strawberry"
+

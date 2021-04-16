@@ -1,0 +1,24 @@
+Concepto: datos enviados por la URL al hacer un request, ejem: form datas
+    http://example.com/over/there?name=ferre
+
+Estructura:
+    añadir los atributos a enviar despues del "?", nombreAtributo=valor
+    '&': enviar varios atributos
+
+Codificación de la URL:
+    No espacios
+    Caracteres especiales: '%' + dos cifras hexadecimales
+    #: fragmento de codigo
+    espacio = '%20'
+    '~' = '%7E'
+
+Rastreamiento:
+    Las cadenas se guardan en el historial del servidor, se usen o no, ratreando usuarios como las cookies
+    Funcion: usuario descarga la pagina, generar id unico, añadir como cadena consulta a los link de la pagina
+    y caundo pase a la siguiente pagina tendremos identificado al usuario y su acceso
+
+        <a href="foo.html">see my page!</a>
+        <a href="bar.html">mine is better</a>
+        Pasa a ser:
+        <a href="foo.html?e0a72cb2a2c7">see my page!</a>
+        <a href="bar.html?e0a72cb2a2c7">mine is better</a>

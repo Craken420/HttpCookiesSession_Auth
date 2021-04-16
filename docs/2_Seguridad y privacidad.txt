@@ -1,0 +1,24 @@
+Seguridad y privacidad
+
+Seguridad
+    Secuestro de sesión y XSS:
+        Cookies almacenan sesion autenticadas, si se roba secuestran la sesion
+    Robos de cookies:
+        "Social Engineerintg" (Ingeniería social),
+        Explotar vulnerabilidades XSS en la aplicación.
+
+Privacidad
+    Cookies first-party: Cookies con mismo dominio de la pagina
+        solo se envían al servidor que las crea
+
+    Cookies third-party: Cookies con diferente dominio de la pagina
+        uso: publicidad
+
+    Cabecera DNT (Do-Not-Track)
+        La aplicacion web desactiva el seguimiento a través de sitios de un usuario concreto.
+
+    Directiva EU:
+        Pedir consentimiento al usuario para manejo de cookies
+
+    Cookies Zombie y Evercookies:
+        Son recreadas después de su eliminación y es difícil intencionalmente eliminarlas para siempre
