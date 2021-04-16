@@ -100,7 +100,9 @@ app.get('/', function(req, res) {
     <a href="/session">Session Secret</a><br/>`)
   const cookies = cookie.parse(req.headers.cookie || '');
   if (cookies.user)
-      res.write(`<a href="/cookies/logout">Logout</a>`);
+    res.write(`<a href="/cookies/logout">Cookie Logout</a><br/>`);
+  if (cookies['session-id'])
+    res.write(`<a href="/session/logout">Session Logout</a>`);
   res.end();
 });
 
@@ -109,7 +111,9 @@ app.get('/httpSecret', auth, showSecretContent);
 
 const cookiesRouter = express.Router();
 
-cookiesRouter.get('/', authCookie, (req, res) => {
+cookiesRouter.use(authCookie);
+
+cookiesRouter.get('/', (req, res) => {
   res.setHeader('Content-Type', 'text/html');
   res.write(`<h1>Welcome to cookies controller</h1>
     <p>req.headers.cookie: ${req.headers.cookie}</p>
@@ -134,14 +138,14 @@ cookiesRouter.get('/', authCookie, (req, res) => {
     <a href="/cookies/clearAllCookies">Clear All Cookies</a><br/>
     <a href="/cookies/expireCookies">Expire Cookies</a><br/>
     <a href="/cookies/request">Request</a><br/>
-    <a href="/session">Sessions</a>
+    <a href="/session">Sessions</a><br/>
     <a href="/">Home</a><br/>`);
   const cookies = cookie.parse(req.headers.cookie || '');
   if (cookies.user)
     res.write(`<a href="/cookies/logout">Logout</a>`);
     res.end();
 });
-cookiesRouter.get('/logout', authCookie, (req, res) => {
+cookiesRouter.get('/logout', (req, res) => {
   req.headers.authorization = undefined;
   res.clearCookie('user').redirect('/');
 });
@@ -166,7 +170,7 @@ cookiesRouter.get('/clearCookieByName', (req, res) => {
   res.clearCookie( String(query.name) ) // Eliminar
       .redirect('/cookies');
 });
-cookiesRouter.get('/clearAllCookies',(req, res) => {
+cookiesRouter.get('/clearAllCookies', (req, res) => {
   Object.getOwnPropertyNames(req.cookies)
     .concat(Object.getOwnPropertyNames(req.signedCookies))
     .forEach(cookieName => {
@@ -225,8 +229,9 @@ cookiesRouter.get('/request', (req, res) => {
           <input placeholder="enter your name" name="cookieName">
           <input type="submit" value="Set Name">
       </form>
-      <a href="/cookies">Cookies</a><br/>`)
-  res.end('<a href="/session">Sessions</a>')
+      <a href="/cookies">Cookies</a><br/>
+      <a href="/session">Sessions</a><br/>`)
+  res.end('<a href="/">Home</a>')
 });
 
 const sessionRouter = express.Router();
@@ -240,7 +245,9 @@ sessionRouter.use(session({
   store: new fileStore({logFn: function(){}}) // No mostrar el logger de archivos no encontrados
 }))
 
-sessionRouter.get('/', authSession, (req, res) => {
+sessionRouter.use(authSession);
+
+sessionRouter.get('/', (req, res) => {
   // Parse the cookies on the request
   const cookies = cookie.parse(req.headers.cookie || '');
 
@@ -251,7 +258,8 @@ sessionRouter.get('/', authSession, (req, res) => {
   res.write(`<h1>Welcome to sessions controller</h1>
     <p>Cookies: ${JSON.stringify(cookies)}</p>
     <p>Session: ${(req.session.user||'visitor')}</p>
-    <p>Cookies.session-id:  ${(sessionid || 'undefined') }</p>`);
+    <p>Cookies.session-id:  ${(sessionid || 'undefined') }</p>
+    <p>req.headers.authorization:  ${JSON.stringify(req.headers.authorization)}</p>`);
 
   if (req.session.views) {
     req.session.views++;
@@ -260,9 +268,21 @@ sessionRouter.get('/', authSession, (req, res) => {
     req.session.views = 1;
 
   if (req.session.user)
-    res.write(`<a href="/session/logout">Logout</a><br/>`);
+    res.write(`<a href="/session/logout">Logout</a><br/>
+      <a href="/cookies">Cookies</a><br/>`);
+  res.end('<a href="/">Home</a><br/>');
+});
 
-  res.end('<a href="/cookies">Cookies</a><br/>');
+sessionRouter.get('/logout', (req, res) => {
+  req.session.destroy();
+  req.headers.authorization = undefined;
+  res.clearCookie('session-id');
+  res.send(`
+  <script>
+      alert("Session destroyed!!");
+      window.location.href = "/"
+  </script>`);
+  res.end();
 });
 
 app.use('/session', sessionRouter)
