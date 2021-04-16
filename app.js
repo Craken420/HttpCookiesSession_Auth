@@ -3,6 +3,7 @@ var express = require('express'),
     logger = require('morgan'),
     cookieParser = require('cookie-parser'),
     cookie = require('cookie'), // Analizador de cookies
+    escapeHTML = require('escape-html'),
     url = require('url'),
     session = require('express-session'),
     fileStore = require('session-file-store')(session);
@@ -10,10 +11,10 @@ var express = require('express'),
 var app = express();
 
 // Middelwares
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser('secret-key'));
+app.use( logger('dev') );
+app.use( express.json() );
+app.use( express.urlencoded({ extended: false }) );
+app.use( cookieParser('secret-key') );
 
 // WWW-Authenticate
 function sendAuth (req, res, next) {
@@ -116,22 +117,23 @@ cookiesRouter.get('/', authCookie, (req, res) => {
     <p>req.signedCookies: ${JSON.stringify(req.signedCookies)}</p>
     <p>req.headers.authorization:  ${JSON.stringify(req.headers.authorization)}</p>
     <form method="GET" action="/cookies/signCookieWithParam">
-      <input placeholder="enter your cookie name" name="name">
-      <input placeholder="enter your cookie val" name="val">
+      <input placeholder="enter your cookie name" name="name" required>
+      <input placeholder="enter your cookie val" name="val" required>
       <input type="submit" value="Generete Sign Cookie With Param">
     </form>
     <form method="GET" action="/cookies/clearCookieByName">
-      <input placeholder="enter your cookie name" name="name">
+      <input placeholder="enter your cookie name" name="name" required>
       <input type="submit" value="Clear Cookie">
     </form>
     <form method="GET" action="/cookies/expireHeaderCookieByName">
-      <input placeholder="enter your cookie name" name="name">
+      <input placeholder="enter your cookie name" name="name" required>
       <input type="submit" value="Expire Cookie">
     </form>
     <a href="/cookies/setCookie">Generete cookie</a><br/>
     <a href="/cookies/setSignCookie">Generete Sign Cookie</a><br/>
     <a href="/cookies/clearAllCookies">Clear All Cookies</a><br/>
     <a href="/cookies/expireCookies">Expire Cookies</a><br/>
+    <a href="/cookies/request">Request</a><br/>
     <a href="/">Home</a><br/>`);
   const cookies = cookie.parse(req.headers.cookie || '');
   if (cookies.user)
@@ -139,7 +141,7 @@ cookiesRouter.get('/', authCookie, (req, res) => {
     res.end();
 });
 cookiesRouter.get('/logout', authCookie, (req, res) => {
-  req.headers.authorization.replace(/.*/, '')
+  req.headers.authorization = undefined;
   res.clearCookie('user').redirect('/');
 });
 cookiesRouter.get('/setCookie', (req, res) => { // definir una nueva cookie
@@ -186,6 +188,46 @@ cookiesRouter.get('/expireCookies', (req, res) => {
   }
   res.redirect('/');
 });
+
+cookiesRouter.get('/request', (req, res) => {
+  // Convertir a objeto la cadena url
+  let query = url.parse(req.url, true, true).query;
+  if (query && query.cookieName) {
+      /* Enviar la nueva cookie
+      *  String(query.name): Angelo; cokie.seriaze: name=Angelo */
+      res.setHeader('Set-Cookie', cookie.serialize('cookieName', String(query.cookieName)), {
+          httpOnly: true,
+          maxAge: 3 //60 * 60 * 60 * 24 * 7 // 1 semana en segundos
+      })
+      // Redireccionar despues de enviar la cookie
+      res.statusCode = 302;
+      res.setHeader('Location', req.headers.refer || '/cookies/request');
+      res.end();
+      return;
+  }
+
+  /*
+  * Obtener la cookie del request form y convertirla en objeto.
+  * Ejemplo: req.headers.cookie: name=Angelo; PARSE cookies:  { name: 'Angelo' }
+  */
+  const cookies = cookie.parse(req.headers.cookie || '')
+
+  // Obtener el nombre del visitante enviado al cookie
+  const name = cookies.cookieName
+
+  res.setHeader('Content-Type', 'text/html; charset=UTF-8')
+  if (name)
+      res.write('<p>Welcome back, <b>' + escapeHTML(name) + '</b>!</p>')
+  else
+      res.write('<p>Hello new visitor</p>')
+  res.write(`<form method="GET">
+          <input placeholder="enter your name" name="cookieName">
+          <input type="submit" value="Set Name">
+      </form>
+      <a href="/cookies">Cookies</a><br/>`)
+  res.end('<a href="/sessionSecret">Sessions</a>')
+});
+
 const sessionRouter = express.Router();
 
 sessionRouter.use(session({
