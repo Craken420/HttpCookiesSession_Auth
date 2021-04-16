@@ -84,8 +84,8 @@ function showSecretContent (req, res) {
   res.setHeader('Content-Type', 'text/html');
   res.write(`<h1>Welcome You're Ahutorized</h1><br>
   <p> You can only see this after you've logged in</p>
-  <a href="/cookie">Cookie</a><br/>
-  <a href="/session">Session</a>
+  <a href="/cookies">Cookie</a><br/>
+  <a href="/sessionSecret">Session</a><br/>
   <a href="/">Home</a>`)
 }
 
@@ -124,9 +124,14 @@ cookiesRouter.get('/', authCookie, (req, res) => {
       <input placeholder="enter your cookie name" name="name">
       <input type="submit" value="Clear Cookie">
     </form>
+    <form method="GET" action="/cookies/expireHeaderCookieByName">
+      <input placeholder="enter your cookie name" name="name">
+      <input type="submit" value="Expire Cookie">
+    </form>
     <a href="/cookies/setCookie">Generete cookie</a><br/>
     <a href="/cookies/setSignCookie">Generete Sign Cookie</a><br/>
     <a href="/cookies/clearAllCookies">Clear All Cookies</a><br/>
+    <a href="/cookies/expireCookies">Expire Cookies</a><br/>
     <a href="/">Home</a><br/>`);
   const cookies = cookie.parse(req.headers.cookie || '');
   if (cookies.user)
@@ -134,6 +139,7 @@ cookiesRouter.get('/', authCookie, (req, res) => {
     res.end();
 });
 cookiesRouter.get('/logout', authCookie, (req, res) => {
+  req.headers.authorization.replace(/.*/, '')
   res.clearCookie('user').redirect('/');
 });
 cookiesRouter.get('/setCookie', (req, res) => { // definir una nueva cookie
@@ -165,7 +171,21 @@ cookiesRouter.get('/clearAllCookies',(req, res) => {
     });
   res.redirect('/cookies');
 });
-
+cookiesRouter.get('/expireHeaderCookieByName', (req, res) => {
+  let query = url.parse(req.url, true, true).query;
+  res.cookie(String(query.name), '', {expires: new Date(0)});
+  res.redirect('/cookies');
+});
+cookiesRouter.get('/expireCookies', (req, res) => {
+  let eCookie = req.cookies;
+  for (var prop in eCookie) {
+      if (!eCookie.hasOwnProperty(prop)) {
+          continue;
+      }
+      res.cookie(prop, '', {expires: new Date(0)});
+  }
+  res.redirect('/');
+});
 const sessionRouter = express.Router();
 
 sessionRouter.use(session({
