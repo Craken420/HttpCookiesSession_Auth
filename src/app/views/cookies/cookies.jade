@@ -1,0 +1,36 @@
+extends ../layout
+
+block content
+    h1= title
+    p req.headers.cookie: #{req.headers.cookie}
+    p req.cookies: #{JSON.stringify(req.cookies)}
+    p req.signedCookies: #{JSON.stringify(req.signedCookies)}
+    p req.headers.authorization:  #{JSON.stringify(req.headers.authorization)}
+    form(method="GET" action="/cookies/signCookieWithParam")
+        input(placeholder="enter your cookie name" name="name" required)
+        input(placeholder="enter your cookie val" name="val" required)
+        input(type="submit" value="Generete Sign Cookie With Param")
+
+    form(method="GET" action="/cookies/clearCookieByName")
+        input(placeholder="enter your cookie name" name="name" required)
+        input(type="submit" value="Clear Cookie")
+
+    form(method="GET" action="/cookies/expireHeaderCookieByName")
+        input(placeholder="enter your cookie name" name="name" required)
+        input(type="submit" value="Expire Cookie")
+
+    a(href="/cookies/setCookie") Generete cookie
+    br
+    a(href="/cookies/setSignCookie") Generete Sign Cookie
+    br
+    a(href="/cookies/clearAllCookies") Clear All Cookies
+    br
+    a(href="/cookies/expireCookies") Expire Cookies
+    br
+    a(href="/cookies/request") Request
+    br
+    a(href="/session") Sessions
+    br
+    a(href="/") Home
+    br
+    a(href="/cookies/logout") Logout

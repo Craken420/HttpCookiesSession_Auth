@@ -1,0 +1,17 @@
+extends ../layout
+
+block content
+    if name
+        p Welcome back,
+            b #{name}
+    else
+        p Hello new visitor
+    form(method="GET")
+        input(placeholder="enter your name" name="cookieName")
+        input(type="submit" value="Set Name")
+
+    a(href="/cookies") Cookies
+    br
+    a(href="/session") Sessions
+    br
+    a(href="/") Home

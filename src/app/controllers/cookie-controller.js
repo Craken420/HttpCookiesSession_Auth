@@ -7,36 +7,7 @@ const controller = {};
 
 // Methods
 controller.main = (req, res) => {
-  res.setHeader('Content-Type', 'text/html');
-  res.write(`<h1>Welcome to cookies controller</h1>
-    <p>req.headers.cookie: ${req.headers.cookie}</p>
-    <p>req.cookies: ${JSON.stringify(req.cookies)}</p>
-    <p>req.signedCookies: ${JSON.stringify(req.signedCookies)}</p>
-    <p>req.headers.authorization:  ${JSON.stringify(req.headers.authorization)}</p>
-    <form method="GET" action="/cookies/signCookieWithParam">
-      <input placeholder="enter your cookie name" name="name" required>
-      <input placeholder="enter your cookie val" name="val" required>
-      <input type="submit" value="Generete Sign Cookie With Param">
-    </form>
-    <form method="GET" action="/cookies/clearCookieByName">
-      <input placeholder="enter your cookie name" name="name" required>
-      <input type="submit" value="Clear Cookie">
-    </form>
-    <form method="GET" action="/cookies/expireHeaderCookieByName">
-      <input placeholder="enter your cookie name" name="name" required>
-      <input type="submit" value="Expire Cookie">
-    </form>
-    <a href="/cookies/setCookie">Generete cookie</a><br/>
-    <a href="/cookies/setSignCookie">Generete Sign Cookie</a><br/>
-    <a href="/cookies/clearAllCookies">Clear All Cookies</a><br/>
-    <a href="/cookies/expireCookies">Expire Cookies</a><br/>
-    <a href="/cookies/request">Request</a><br/>
-    <a href="/session">Sessions</a><br/>
-    <a href="/">Home</a><br/>`);
-  const cookies = cookie.parse(req.headers.cookie || '');
-  if (cookies.user)
-    res.write(`<a href="/cookies/logout">Logout</a>`);
-  res.end();
+  res.render('cookies/cookies', { title: 'Welcome to cookies controller', req: req});
 };
 
 controller.logout = (req, res) => {
@@ -95,11 +66,9 @@ controller.expireCookies = (req, res) => {
 controller.onRequest = (req, res) => {
   let query = url.parse(req.url, true, true).query; // url string to object
   if (query && query.cookieName) {
-    /* Send a new cookie
-    *  String(query.name): Angelo; cokie.seriaze: name=Angelo */
     res.setHeader('Set-Cookie', cookie.serialize('cookieName', String(query.cookieName)), {
-        httpOnly: true,
-        maxAge: 3 //60 * 60 * 60 * 24 * 7 // 1 semana en segundos
+      httpOnly: true,
+      maxAge: 3 //60 * 60 * 60 * 24 * 7 // 1 semana en segundos
     })
     res.statusCode = 302;
     res.setHeader('Location',
@@ -107,26 +76,8 @@ controller.onRequest = (req, res) => {
     res.end();
     return;
   }
-
-  /*
-  * Get the request cookie form and parse to object
-  * Example: req.headers.cookie: name=Angelo; PARSE cookies:  { name: 'Angelo' }
-  */
   const cookies = cookie.parse(req.headers.cookie || '')
-  const name = cookies.cookieName // Get the cookie user name
-
-  res.setHeader('Content-Type', 'text/html; charset=UTF-8')
-  if (name)
-    res.write('<p>Welcome back, <b>' + escapeHTML(name) + '</b>!</p>')
-  else
-    res.write('<p>Hello new visitor</p>')
-  res.write(`<form method="GET">
-      <input placeholder="enter your name" name="cookieName">
-      <input type="submit" value="Set Name">
-    </form>
-    <a href="/cookies">Cookies</a><br/>
-    <a href="/session">Sessions</a><br/>`)
-  res.end('<a href="/">Home</a>')
+  res.render('./cookies/onRequest', { name: cookies.cookieName });
 };
 
 module.exports = controller;
