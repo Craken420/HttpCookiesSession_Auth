@@ -236,14 +236,29 @@ cookiesRouter.get('/request', (req, res) => {
 
 const sessionRouter = express.Router();
 
-sessionRouter.use(session({
+var cookiedata = { 
+  domain         : 'localhost',
+  originalMaxAge : null,
+  httpOnly       : true,
+  path           : '/session'
+};
+
+const sessOpc = {
   name:'session-id',
   secret:'123456xxx',
   saveUninitialized: false,
   resave: false,
+  cookie: cookiedata,
   retries: 0, // No intente buscar sesiones caducadas
   store: new fileStore({logFn: function(){}}) // No mostrar el logger de archivos no encontrados
-}))
+}
+
+if (sessionRouter.get('env') === 'production') {
+  sessionRouter.set('trust proxy', 1) // trust first proxy
+  sessOpc.cookie.secure = true // serve secure cookies 'cause it won't be set by client
+}
+
+sessionRouter.use(session(sessOpc))
 
 sessionRouter.use(authSession);
 
