@@ -86,7 +86,7 @@ function showSecretContent (req, res) {
   res.write(`<h1>Welcome You're Ahutorized</h1><br>
   <p> You can only see this after you've logged in</p>
   <a href="/cookies">Cookie</a><br/>
-  <a href="/sessionSecret">Session</a><br/>
+  <a href="/session">Session</a><br/>
   <a href="/">Home</a>`)
 }
 
@@ -97,7 +97,7 @@ app.get('/', function(req, res) {
   res.write(`<h1>Welcome to the HTTP authentication</h1>
     <a href="/httpSecret">Http Secret</a><br/>
     <a href="/cookies">Cookie Secret</a><br/>
-    <a href="/sessionSecret">Session Secret</a><br/>`)
+    <a href="/session">Session Secret</a><br/>`)
   const cookies = cookie.parse(req.headers.cookie || '');
   if (cookies.user)
       res.write(`<a href="/cookies/logout">Logout</a>`);
@@ -134,6 +134,7 @@ cookiesRouter.get('/', authCookie, (req, res) => {
     <a href="/cookies/clearAllCookies">Clear All Cookies</a><br/>
     <a href="/cookies/expireCookies">Expire Cookies</a><br/>
     <a href="/cookies/request">Request</a><br/>
+    <a href="/session">Sessions</a>
     <a href="/">Home</a><br/>`);
   const cookies = cookie.parse(req.headers.cookie || '');
   if (cookies.user)
@@ -225,7 +226,7 @@ cookiesRouter.get('/request', (req, res) => {
           <input type="submit" value="Set Name">
       </form>
       <a href="/cookies">Cookies</a><br/>`)
-  res.end('<a href="/sessionSecret">Sessions</a>')
+  res.end('<a href="/session">Sessions</a>')
 });
 
 const sessionRouter = express.Router();
@@ -239,9 +240,32 @@ sessionRouter.use(session({
   store: new fileStore({logFn: function(){}}) // No mostrar el logger de archivos no encontrados
 }))
 
-sessionRouter.get('/sessionSecret', authSession, showSecretContent)
+sessionRouter.get('/', authSession, (req, res) => {
+  // Parse the cookies on the request
+  const cookies = cookie.parse(req.headers.cookie || '');
 
-app.use('/', sessionRouter)
+  // Get the visitor name set in the cookie
+  const sessionid = cookies['session-id'];
+
+  res.setHeader('Content-Type', 'text/html');
+  res.write(`<h1>Welcome to sessions controller</h1>
+    <p>Cookies: ${JSON.stringify(cookies)}</p>
+    <p>Session: ${(req.session.user||'visitor')}</p>
+    <p>Cookies.session-id:  ${(sessionid || 'undefined') }</p>`);
+
+  if (req.session.views) {
+    req.session.views++;
+    res.write(`<p>Session Views: ${req.session.views}</p>`);
+  } else
+    req.session.views = 1;
+
+  if (req.session.user)
+    res.write(`<a href="/session/logout">Logout</a><br/>`);
+
+  res.end('<a href="/cookies">Cookies</a><br/>');
+});
+
+app.use('/session', sessionRouter)
 app.use('/cookies', cookiesRouter)
 
 module.exports = app;
