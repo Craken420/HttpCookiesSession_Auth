@@ -4,7 +4,7 @@
   "description": "This is a practice for handle sessions, cookies and http auth",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon www"
+    "start": "nodemon src/bin/www"
   },
   "repository": {
     "type": "git",
