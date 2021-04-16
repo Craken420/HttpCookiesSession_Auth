@@ -3,13 +3,18 @@ var express = require('express'),
     createError = require('http-errors'),
     logger = require('morgan'),
     cookieParser = require('cookie-parser'),
-    cookie = require('cookie'), // Analizador de cookies
+    cookie = require('cookie'), // Cookie analyzer
     escapeHTML = require('escape-html'),
     url = require('url'),
+    path = require('path'),
     session = require('express-session'),
     fileStore = require('session-file-store')(session);
 
 var app = express();
+
+// View engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
 
 // Middelwares
 app.use( logger('dev') );
@@ -35,8 +40,8 @@ function getAuth(req, res, next) {
     .split(":");
   return {username: auth[0], password: auth[1]}
 }
-// Auth middleware
-function auth (req, res, next) {
+
+function auth (req, res, next) { // Auth middleware
   authResu = getAuth(req, res, next);
   if (authResu.username == "angelo" && authResu.password == "1234")
     next();
@@ -91,9 +96,12 @@ function showSecretContent (req, res) {
   <a href="/">Home</a>`)
 }
 
+app.get('/', function(req, res, next) {
+  res.render('index', { title: 'Welcome to the HTTP authentication' });
+});
+
 // Routes
-// Main route
-app.get('/', function(req, res) {
+app.get('/', function(req, res) { // Main route
   res.setHeader('Content-Type', 'text/html');
   res.write(`<h1>Welcome to the HTTP authentication</h1>
     <a href="/httpSecret">Http Secret</a><br/>
@@ -107,8 +115,7 @@ app.get('/', function(req, res) {
   res.end();
 });
 
-// Secret content
-app.get('/httpSecret', auth, showSecretContent);
+app.get('/httpSecret', auth, showSecretContent); // Secret content
 
 const cookiesRouter = express.Router();
 
@@ -150,32 +157,32 @@ cookiesRouter.get('/logout', (req, res) => {
   req.headers.authorization = undefined;
   res.clearCookie('user').redirect('/');
 });
-cookiesRouter.get('/setCookie', (req, res) => { // definir una nueva cookie
+cookiesRouter.get('/setCookie', (req, res) => { // new cookie
   res.cookie('cookie_name', 'cookie_value',{expire : new Date() + 9999})
     .redirect('/cookies');});
 
 cookiesRouter.get('/setSignCookie', (req, res) => {
   let cookieVal = 'sing-cookie_value';
-  res.cookie('sign-cookie_name', cookieVal, // definir una nueva cookie
-      { signed: true, expire : new Date() + 9999 }) // firmar y agregar expiracion
+  res.cookie('sign-cookie_name', cookieVal, // new cookie
+      { signed: true, expire : new Date() + 9999 }) // add sign and expire
       .redirect('/cookies');
 });
 cookiesRouter.get('/signCookieWithParam', (req, res) => {
   let {name, val} =
-      url.parse(req.url, true, true).query; // Extraer parametros
-  res.cookie(String(name), String(val), { signed: true } ) // Crear y firmar cookie
+      url.parse(req.url, true, true).query; // get params
+  res.cookie(String(name), String(val), { signed: true } ) // make and sign cookie
     .redirect('/cookies');
 });
 cookiesRouter.get('/clearCookieByName', (req, res) => {
   let query = url.parse(req.url, true, true).query;
-  res.clearCookie( String(query.name) ) // Eliminar
+  res.clearCookie( String(query.name) ) // delete
       .redirect('/cookies');
 });
 cookiesRouter.get('/clearAllCookies', (req, res) => {
   Object.getOwnPropertyNames(req.cookies)
     .concat(Object.getOwnPropertyNames(req.signedCookies))
     .forEach(cookieName => {
-        res.clearCookie(cookieName); // Eliminar
+        res.clearCookie(cookieName); // delete
     });
   res.redirect('/cookies');
 });
@@ -196,30 +203,27 @@ cookiesRouter.get('/expireCookies', (req, res) => {
 });
 
 cookiesRouter.get('/request', (req, res) => {
-  // Convertir a objeto la cadena url
-  let query = url.parse(req.url, true, true).query;
+  let query = url.parse(req.url, true, true).query; // url string to object
   if (query && query.cookieName) {
-      /* Enviar la nueva cookie
+      /* Send a new cookie
       *  String(query.name): Angelo; cokie.seriaze: name=Angelo */
       res.setHeader('Set-Cookie', cookie.serialize('cookieName', String(query.cookieName)), {
           httpOnly: true,
           maxAge: 3 //60 * 60 * 60 * 24 * 7 // 1 semana en segundos
       })
-      // Redireccionar despues de enviar la cookie
       res.statusCode = 302;
-      res.setHeader('Location', req.headers.refer || '/cookies/request');
+      res.setHeader('Location', req.headers.refer
+        || '/cookies/request'); // Redirect after set the cookie
       res.end();
       return;
   }
 
   /*
-  * Obtener la cookie del request form y convertirla en objeto.
-  * Ejemplo: req.headers.cookie: name=Angelo; PARSE cookies:  { name: 'Angelo' }
+  * Get the request cookie form and parse to object
+  * Example: req.headers.cookie: name=Angelo; PARSE cookies:  { name: 'Angelo' }
   */
   const cookies = cookie.parse(req.headers.cookie || '')
-
-  // Obtener el nombre del visitante enviado al cookie
-  const name = cookies.cookieName
+  const name = cookies.cookieName // Get the cookie user name
 
   res.setHeader('Content-Type', 'text/html; charset=UTF-8')
   if (name)
@@ -250,8 +254,8 @@ const sessOpc = {
   saveUninitialized: false,
   resave: false,
   cookie: cookiedata,
-  retries: 0, // No intente buscar sesiones caducadas
-  store: new fileStore({logFn: function(){}}) // No mostrar el logger de archivos no encontrados
+  retries: 0, // don't search expired sessions
+  store: new fileStore({logFn: function(){}}) // don't show log of files not found
 }
 
 if (sessionRouter.get('env') === 'production') {
@@ -264,11 +268,9 @@ sessionRouter.use(session(sessOpc))
 sessionRouter.use(authSession);
 
 sessionRouter.get('/', (req, res) => {
-  // Parse the cookies on the request
-  const cookies = cookie.parse(req.headers.cookie || '');
-
-  // Get the visitor name set in the cookie
-  const sessionid = cookies['session-id'];
+ 
+  const cookies = cookie.parse(req.headers.cookie || ''); // Parse the cookies on the request
+  const sessionid = cookies['session-id']; // Get the visitor name set in the cookie
 
   res.setHeader('Content-Type', 'text/html');
   res.write(`<h1>Welcome to sessions controller</h1>
@@ -303,7 +305,6 @@ sessionRouter.get('/logout', (req, res) => {
 
 app.use('/session', sessionRouter)
 app.use('/cookies', cookiesRouter)
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
