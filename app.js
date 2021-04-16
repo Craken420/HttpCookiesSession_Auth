@@ -21,6 +21,7 @@ app.use( logger('dev') );
 app.use( express.json() );
 app.use( express.urlencoded({ extended: false }) );
 app.use( cookieParser('secret-key') );
+app.use(express.static(path.join(__dirname, 'public')));
 
 // WWW-Authenticate
 function sendAuth (req, res, next) {
