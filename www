@@ -12,7 +12,7 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
-var port = '3000';
+var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
@@ -31,13 +31,25 @@ server.on('listening', onListening);
 
 
 /**
+ * Normalize a port into a number, string, or false.
+ */
+
+ function normalizePort(val) {
+    var port = parseInt(val, 10);
+    if ( isNaN(port) )
+      return val; // named pipe
+    if (port >= 0)
+      return port;  // port number
+    return false;
+}
+
+/**
  * Event listener for HTTP server "error" event.
  */
 function onError(error) {
-    if (error.syscall !== 'listen') {
+    if (error.syscall !== 'listen')
       throw error;
-    }
-  
+
     var bind = typeof port === 'string'
       ? 'Pipe ' + port
       : 'Port ' + port;
