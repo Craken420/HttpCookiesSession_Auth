@@ -53,4 +53,27 @@ controller.signup = (req, res) => {
   }
 };
 
+controller.login = (req, res) => {
+  console.log('login-Users: ', Users);
+  let exist = false;
+  if(!req.body.id || !req.body.password)
+    res.render('./session/signupOrLogin', {message: "Please enter both id and password",
+      route: '/session/login'});
+  else {
+    Users.filter((user) => {
+      if (user.id === req.body.id && user.password === req.body.password) {
+        exist = true;
+        req.session.user = user;
+      } else
+        exist = false
+    });
+
+    if (!exist)
+      res.render('./session/signupOrLogin',
+        { message: "Invalid credentials!", route: '/session/login'});
+    else
+      controller.secretContent(req, res);
+  }
+};
+
 module.exports = controller;

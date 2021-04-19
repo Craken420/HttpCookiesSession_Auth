@@ -41,4 +41,9 @@ router.get('/signup', (req, res) => res.render('session/signupOrLogin',
   {title: 'Welcome to signup', route: '/session/signup'}));
 router.post('/signup', Ctrl.signup);
 
+router.get('/login', (req, res) => res.render('session/signupOrLogin',
+  {title: 'Welcome to login', route: '/session/login'}));
+
+router.post('/login', Ctrl.login);
+
 module.exports = router;
