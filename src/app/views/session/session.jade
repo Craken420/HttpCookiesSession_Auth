@@ -1,11 +1,16 @@
 extends ../layout
 
+mixin link(descrip, link, descLink)
+  li.container
+    .box
+      h4 #{descrip}
+      a(href=link) #{descLink}
+
 block content
   h1= title
   p Welcome to #{title}
-  .container
-    .box
-      h4 Secret content with WWW Auth of Fixed Session:
-      a(href="/session/secretFixedSession") Secret
+  ul
+    +link("Secret content with WWW Auth of Fixed Session:",
+      '/session/secretFixedSession', 'Secret')
+    +link("Go back:", '/', 'Home')
   br
-black cat
