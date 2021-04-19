@@ -13,13 +13,13 @@ var cookiedata = {
 };
 
 const sessOpc = {
-  name:'session-id',
-  secret:'123456xxx',
+  name: 'session-id',
+  secret: '123456xxx',
   saveUninitialized: false,
   resave: false,
   cookie: cookiedata,
   retries: 0, // don't search expired sessions
-  store: new fileStore({logFn: function(){}}) // don't show log of files not found
+  // store: new fileStore({logFn: function(){}}) // don't show log of files not found
 }
 
 if (router.get('env') === 'production') {
@@ -31,10 +31,14 @@ if (router.get('env') === 'production') {
 router.use(session(sessOpc))
 
 // Routes
-router.get('/', function(req, res){
-  res.render('session/session', {title: 'Login with Sessions'});
-});
+router.get('/', (req, res) => { res.render('session/session', {title: 'Login with Sessions'} )});
+
+// www auth with fixed user
 router.get('/secretFixedSession', middleware.authFixedSession, Ctrl.secretContent);
-router.get('/logout', Ctrl.logout);
+
+// session auth basic from a form
+router.get('/signup', (req, res) => res.render('session/signupOrLogin',
+  {title: 'Welcome to signup', route: '/session/signup'}));
+router.post('/signup', Ctrl.signup);
 
 module.exports = router;

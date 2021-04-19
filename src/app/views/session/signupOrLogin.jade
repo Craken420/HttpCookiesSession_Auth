@@ -1,0 +1,13 @@
+extends ../layout
+
+block content
+   h1= title
+   if(message)
+      h4 #{message}
+   form(action=route method = "POST")
+      input(name = "id" type = "text" required placeholder = "User ID")
+      input(name = "password" type = "password" required placeholder = "Password")
+      br
+      button(type = "Submit") Sign me up!
+      br
+      a(href="/session") Go back

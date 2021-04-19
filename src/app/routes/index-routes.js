@@ -1,7 +1,7 @@
 // Dependencies
 const router = require('express').Router(),
       middleware = require('../middlewares/routes-middlewares'),
-      Ctrl = require('../controllers/index-controller')
+      Ctrl = require('../controllers/index-controller');
 
 // Routes
 router.get('/', Ctrl.main);
