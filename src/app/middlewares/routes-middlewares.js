@@ -45,7 +45,7 @@ middleware.authCookie = function (req, res, next) {
   }
 }
 
-middleware.authSession = function (req, res, next) {
+middleware.authFixedSession = function (req, res, next) {
   if  (!req.session.user) { // Check user session
     authResu = getAuth(req, res, next);
     if (authResu.username == "session" && authResu.password == "1234") {

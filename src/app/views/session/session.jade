@@ -1,14 +1,11 @@
 extends ../layout
 
 block content
-    h1= title
-    p Session Views: #{req.session.views}
-    p Cookies: #{JSON.stringify(cookies)}
-    p Session: #{(req.session.user||'visitor')}
-    p Cookies.session-id:  #{(sessionid || 'undefined')}
-    p req.headers.authorization:  #{JSON.stringify(req.headers.authorization)}
-    a(href="/cookies") Cookies
-    br
-    a(href="/") Home
-    br
-    a(href="/session/logout") Log out
+  h1= title
+  p Welcome to #{title}
+  .container
+    .box
+      h4 Secret content with WWW Auth of Fixed Session:
+      a(href="/session/secretFixedSession") Secret
+  br
+black cat

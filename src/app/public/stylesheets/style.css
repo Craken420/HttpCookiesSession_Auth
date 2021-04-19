@@ -4,5 +4,18 @@ body {
 }
 
 a {
-  color: #00B7FF;
+  color: #0044ff;
+}
+
+.container {
+  display: flex;
+  padding: 10px;
+  width: 50%;
+  background-color: #4c4d4a;
+}
+
+.box {
+  padding: 10px;
+  width: 100%;
+  background-color: #bbc0bd;
 }

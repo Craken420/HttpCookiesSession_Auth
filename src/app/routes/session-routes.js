@@ -29,10 +29,12 @@ if (router.get('env') === 'production') {
 
 // Middlewares
 router.use(session(sessOpc))
-router.use(middleware.authSession);
 
 // Routes
-router.get('/', Ctrl.main);
+router.get('/', function(req, res){
+  res.render('session/session', {title: 'Login with Sessions'});
+});
+router.get('/secretFixedSession', middleware.authFixedSession, Ctrl.secretContent);
 router.get('/logout', Ctrl.logout);
 
 module.exports = router;
