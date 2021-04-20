@@ -12,8 +12,11 @@ block content
   ul
     +link("Secret content with WWW Auth of Fixed Session:",
       '/session/secretFixedSession', 'Secret')
+    +link("Secret content with any Session:", '/session/secretSession', 'Secret with session')
     +link("Sign up in array user with Form:", '/session/signup', 'Sign Up')
     +link("Log in array user with Form:", '/session/login', 'Login')
+    if (req.session.user)
+      +link("Log out:", '/session/logout', 'Logout')
     +link("Go back:", '/', 'Home')
   br
   br

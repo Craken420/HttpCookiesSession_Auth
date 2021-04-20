@@ -31,7 +31,7 @@ if (router.get('env') === 'production') {
 router.use(session(sessOpc))
 
 // Routes
-router.get('/', (req, res) => { res.render('session/session', {title: 'Login with Sessions'} )});
+router.get('/', (req, res) => { res.render('session/session', {title: 'Login with Sessions', req: req} )});
 
 // www auth with fixed user
 router.get('/secretFixedSession', middleware.authFixedSession, Ctrl.secretContent);
@@ -45,5 +45,9 @@ router.get('/login', (req, res) => res.render('session/signupOrLogin',
   {title: 'Welcome to login', route: '/session/login'}));
 
 router.post('/login', Ctrl.login);
+
+router.get('/secretSession', middleware.authSession, Ctrl.secretContent);
+
+router.get('/logout', Ctrl.logout);
 
 module.exports = router;
