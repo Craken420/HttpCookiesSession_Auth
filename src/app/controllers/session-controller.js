@@ -38,7 +38,7 @@ controller.signup = (req, res) => {
   console.log('signup-Users: ', Users);
   if (!req.body.id || !req.body.password)
     res.render('./session/signupOrLogin', {message: "Please enter both id and password",
-      route: '/session/signup'});
+      route: '/session/signup', back: '/session'});
   else {
     Users.filter( (user) => (user.id === req.body.id) ? exist = true : exist = false );
     if (!exist) {
@@ -49,7 +49,7 @@ controller.signup = (req, res) => {
     } else
       res.render('session/signupOrLogin', {
         message: 'User Already Exists! Login or choose another user id',
-        route: '/session/signup'});
+        route: '/session/signup', back: '/session'});
   }
 };
 
@@ -58,7 +58,7 @@ controller.login = (req, res) => {
   let exist = false;
   if(!req.body.id || !req.body.password)
     res.render('./session/signupOrLogin', {message: "Please enter both id and password",
-      route: '/session/login'});
+      route: '/session/login', back: '/session'});
   else {
     Users.filter((user) => {
       if (user.id === req.body.id && user.password === req.body.password) {
@@ -70,10 +70,12 @@ controller.login = (req, res) => {
 
     if (!exist)
       res.render('./session/signupOrLogin',
-        { message: "Invalid credentials!", route: '/session/login'});
+        { message: "Invalid credentials!", route: '/session/login', back: '/session'});
     else
       controller.secretContent(req, res);
   }
 };
+
+controller.getUsers = () => Users
 
 module.exports = controller;

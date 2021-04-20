@@ -1,0 +1,18 @@
+extends ../layout
+
+mixin link(descrip, link, descLink)
+  li.container
+    .box
+      h4 #{descrip}
+      a(href=link) #{descLink}
+
+block content
+  h1= title
+  p Welcome to #{title}
+  ul
+    +link("Sign up with auth:", '/authJwt/signup', 'Signup')
+    +link("Show Users:", '/authJwt/users', 'users')
+    +link("Go to Sessions:", '/session', 'Sessions')
+    +link("Go back:", '/', 'Home')
+  br
+  br

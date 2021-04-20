@@ -37,14 +37,15 @@ router.get('/', (req, res) => { res.render('session/session', {title: 'Login wit
 router.get('/secretFixedSession', middleware.authFixedSession, Ctrl.secretContent);
 
 // session auth basic from a form
-router.get('/signup', (req, res) => res.render('session/signupOrLogin',
-  {title: 'Welcome to signup', route: '/session/signup'}));
-router.post('/signup', Ctrl.signup);
+router.route('/signup')
+  .get((req, res) => res.render('session/signupOrLogin',
+      {title: 'Welcome to signup', route: '/session/signup', back: '/session'}))
+  .post(Ctrl.signup);
 
-router.get('/login', (req, res) => res.render('session/signupOrLogin',
-  {title: 'Welcome to login', route: '/session/login'}));
-
-router.post('/login', Ctrl.login);
+router.route('/login')
+  .get((req, res) => res.render('session/signupOrLogin',
+    {title: 'Welcome to login', route: '/session/login', back: '/session'}))
+  .post(Ctrl.login);
 
 router.get('/secretSession', middleware.authSession, Ctrl.secretContent);
 

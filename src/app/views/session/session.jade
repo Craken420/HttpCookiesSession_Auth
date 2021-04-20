@@ -10,13 +10,14 @@ block content
   h1= title
   p Welcome to #{title}
   ul
-    +link("Secret content with WWW Auth of Fixed Session:",
+    +link('Secret content with WWW Auth of Fixed Session:',
       '/session/secretFixedSession', 'Secret')
-    +link("Secret content with any Session:", '/session/secretSession', 'Secret with session')
-    +link("Sign up in array user with Form:", '/session/signup', 'Sign Up')
-    +link("Log in array user with Form:", '/session/login', 'Login')
+    +link('Secret content with any Session:', '/session/secretSession', 'Secret with session')
+    +link('Sign up in array user with Form:', '/session/signup', 'Sign Up')
+    +link('Log in array user with Form:', '/session/login', 'Login')
+    +link('Lets Authenticate:', '/authJwt', 'Authenticate')
     if (req.session.user)
-      +link("Log out:", '/session/logout', 'Logout')
-    +link("Go back:", '/', 'Home')
+      +link('Log out:', '/session/logout', 'Logout')
+    +link('Go back:', '/', 'Home')
   br
   br

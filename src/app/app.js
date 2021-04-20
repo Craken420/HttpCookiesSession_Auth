@@ -24,6 +24,7 @@ app.use( express.static( path.join(__dirname, 'public') ) );
 app.use('/', require('./routes/index-routes') );
 app.use('/session', require('./routes/session-routes') );
 app.use('/cookies', require('./routes/cookie-routes') );
+app.use('/authJwt', require('./routes/jwt-routes') );
 
 // Error handler
 app.use( (req, res, next) => next( createError(404) ) ); // catch 404 and forward to error handler

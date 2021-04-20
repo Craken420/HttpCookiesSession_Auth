@@ -1,3 +1,5 @@
+const config = require('../configs/config');
+const jwt = require('jsonwebtoken');
 const middleware = {};
 
 // WWW-Authenticate
@@ -73,4 +75,23 @@ middleware.authSession = function (req, res, next) {
     next(err);  //Error, trying to access unauthorized page!
   }
 };
+
+middleware.authToken = (req, res, next) => {
+  let token = req.cookies.token;
+  console.log('token: ', token)
+  if (token) {
+    jwt.verify(token, config.llave, (err, decoded) => {
+      if (err)
+        next(err);  //Error, trying to access unauthorized page!
+      else {
+        req.decoded = decoded;
+        next();
+      }
+    });
+  } else {
+    var err = new Error("Token no proveída.");
+    next(err);  //Error, trying to access unauthorized page!
+  }
+}
+
 module.exports = middleware;
