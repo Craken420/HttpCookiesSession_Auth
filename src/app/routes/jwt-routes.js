@@ -11,6 +11,11 @@ router.route('/signup')
       {title: 'Welcome to auth token signup', route: '/authJwt/signup', back: '/authJwt'}))
   .post(Ctrl.signup);
 
+router.route('/signin')
+    .get((req, res) => res.render('session/signupOrLogin', {title: 'Lets signin you',
+        route: '/authJwt/signin', back: '/authJwt'}))
+    .post(Ctrl.authenticate);
+
 router.get('/users', middleware.authToken, (req, res) => res.send('Protected content'));
 
 module.exports = router;

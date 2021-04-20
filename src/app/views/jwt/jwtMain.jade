@@ -11,6 +11,8 @@ block content
   p Welcome to #{title}
   ul
     +link("Sign up with auth:", '/authJwt/signup', 'Signup')
+    +link("Lets Authenticate:",
+      '/authJwt/signin', 'Signin')
     +link("Show Users:", '/authJwt/users', 'users')
     +link("Go to Sessions:", '/session', 'Sessions')
     +link("Go back:", '/', 'Home')

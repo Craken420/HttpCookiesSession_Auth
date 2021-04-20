@@ -29,4 +29,30 @@ controller.signup = (req, res) => {
   }
 };
 
+controller.authenticate = (req, res) => {
+  console.log('login-Users: ', AuthUsers);
+  let exist = false;
+  if(!req.body.id || !req.body.password)
+    res.render('./session/signupOrLogin', {message: "Please enter both id and password",
+      route: '/authJwt/signin', back: '/authJwt'});
+  else {
+    let token = '';
+    AuthUsers.filter((user) => {
+      if (user.id === req.body.id && user.password === req.body.password) {
+        exist = true;
+        token = user.token;
+      } else
+        exist = false
+    });
+
+    if (!exist)
+      res.render('./session/signupOrLogin',
+        { message: "Invalid credentials!", route: '/authJwt/signin', back: '/authJwt'});
+    else {
+      res.cookie('token', token);
+      res.redirect('/authJwt/users');
+    }
+  }
+};
+
 module.exports = controller;
