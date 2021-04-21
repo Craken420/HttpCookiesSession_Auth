@@ -17,16 +17,19 @@ controller.signup = (req, res) => {
   else {
     AuthUsers.filter( (user) => (user.id === req.body.id) ? exist = true : exist = false );
     if (!exist) {
-      var newUser = {id: req.body.id, password: req.body.password};
+      let newUser = {id: req.body.id, password: req.body.password};
       let token = jwt.sign(newUser, config.llave, { expiresIn: 1440 });
       newUser.token = token;
       AuthUsers.push(newUser);
 
-      var url = 'http://localhost:3000/authJwt/users';
-      var headers = {
+      let url = 'http://localhost:3000/authJwt/users';
+      let headers = {
         'Authorization': token,
       };
-      request.get({ url: url, headers: headers }, function (err, r, body) {
+      let form = {
+        token: token
+      }
+      request.get({ url: url, form: form, headers: headers }, function (err, r, body) {
           res.send(body)
       });
     } else
