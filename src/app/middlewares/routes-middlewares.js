@@ -77,7 +77,7 @@ middleware.authSession = function (req, res, next) {
 };
 
 middleware.authToken = (req, res, next) => {
-  let token = req.cookies.token;
+  let token = req.headers['authorization'];
   console.log('token: ', token)
   if (token) {
     jwt.verify(token, config.llave, (err, decoded) => {
