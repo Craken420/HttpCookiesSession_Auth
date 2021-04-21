@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+const fetch = require('node-fetch');
 const controller = {};
 const config = require('../configs/config');
 
@@ -22,8 +22,24 @@ controller.signup = (req, res) => {
       newUser.token = token;
       AuthUsers.push(newUser);
 
-      res.cookie('token', token);
-      res.redirect('/authJwt/users');
+      const myHeader = new fetch.Headers({
+        'Authorization': token
+      });
+
+      const myInit = {
+        method: 'GET',
+        headers: myHeader,
+        mode: 'cors',
+        cache: 'default'
+      };
+
+      const myRequest = new fetch.Request('http://localhost:3000/authJwt/users', myInit);
+
+      fetch(myRequest)
+        .then (response => response.json())
+        .then (data => {
+          res.send(data)
+      })
     } else
       res.render('session/signupOrLogin', {
         message: 'User Already Exists! Login or choose another user id',
@@ -51,8 +67,24 @@ controller.authenticate = (req, res) => {
       res.render('./session/signupOrLogin',
         { message: "Invalid credentials!", route: '/authJwt/signin', back: '/authJwt'});
     else {
-      res.cookie('token', token);
-      res.redirect('/authJwt/users');
+      const myHeader = new fetch.Headers({
+        'Authorization': token
+      });
+
+      const myInit = {
+        method: 'GET',
+        headers: myHeader,
+        mode: 'cors',
+        cache: 'default'
+      };
+
+      const myRequest = new fetch.Request('http://localhost:3000/authJwt/users', myInit);
+
+      fetch(myRequest)
+        .then (response => response.json())
+        .then (data => {
+          res.send(data)
+      })
     }
   }
 };
