@@ -16,6 +16,7 @@ router.route('/signin')
         route: '/authJwt/signin', back: '/authJwt'}))
     .post(Ctrl.authenticate);
 
-router.get('/users', middleware.authToken, (req, res) => res.send('Protected content'));
+router.get('/users', middleware.authToken, (req, res) =>
+    res.send( Ctrl.getUsers() ) );
 
 module.exports = router;

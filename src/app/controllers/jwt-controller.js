@@ -5,6 +5,8 @@ const config = require('../configs/config');
 
 const AuthUsers = [];
 
+controller.getUsers = () => AuthUsers;
+
 // Sign up in array user with Form
 controller.signup = (req, res) => {
   let exist = false;
