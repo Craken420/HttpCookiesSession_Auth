@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+const request = require('request');
 const controller = {};
 const config = require('../configs/config');
 
@@ -22,8 +22,13 @@ controller.signup = (req, res) => {
       newUser.token = token;
       AuthUsers.push(newUser);
 
-      res.cookie('token', token);
-      res.redirect('/authJwt/users');
+      var url = 'http://localhost:3000/authJwt/users';
+      var headers = {
+        'Authorization': token,
+      };
+      request.get({ url: url, headers: headers }, function (err, r, body) {
+          res.send(body)
+      });
     } else
       res.render('session/signupOrLogin', {
         message: 'User Already Exists! Login or choose another user id',
@@ -51,8 +56,13 @@ controller.authenticate = (req, res) => {
       res.render('./session/signupOrLogin',
         { message: "Invalid credentials!", route: '/authJwt/signin', back: '/authJwt'});
     else {
-      res.cookie('token', token);
-      res.redirect('/authJwt/users');
+      var url = 'http://localhost:3000/authJwt/users';
+      var headers = {
+        'Authorization': token,
+      };
+      request.get({ url: url, headers: headers }, function (err, r, body) {
+          res.send(body)
+      });
     }
   }
 };
