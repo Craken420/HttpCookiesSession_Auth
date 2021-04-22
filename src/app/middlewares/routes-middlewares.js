@@ -85,6 +85,10 @@ middleware.authToken = (req, res, next) => {
       if (err)
         next(err);  //Error, trying to access unauthorized page!
       else {
+        if (decoded.exp <= Date.now()) {
+          var err = new Error("Access token has expired");
+          next(err);  //Error, trying to access unauthorized page!
+        }
         req.decoded = decoded;
         next();
       }
